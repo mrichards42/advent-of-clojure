@@ -14,6 +14,7 @@
             [advent-2018.day10 :as day10]
             [advent-2018.day11 :as day11]
             [advent-2018.day12 :as day12]
+            [advent-2018.day13 :as day13]
             ))
 
 (deftest day01-test
@@ -74,3 +75,7 @@
 (deftest day12-test
   (is (= 1787 (util/run day12/part1)))
   (is (= 1100000000475 (util/run day12/part2))))
+
+(deftest day13-test
+  (is (= [83 49] (util/run day13/part1)))
+  (is (= [73 36] (util/run day13/part2))))
