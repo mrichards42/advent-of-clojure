@@ -5,6 +5,9 @@
             [advent-2019.day02 :as day02]
             [advent-2019.day03 :as day03]
             [advent-2019.day04 :as day04]
+            [advent-2019.day05 :as day05]
+            [advent-2019.day06 :as day06]
+            [advent-2019.day07 :as day07]
             ))
 
 (deftest day01-test
@@ -22,3 +25,15 @@
 (deftest day04-test
   (is (= 1929 (day04/part1)))
   (is (= 1306 (day04/part2))))
+
+(deftest day05-test
+  (is (= 10987514 (util/run day05/part1)))
+  (is (= 14195011 (util/run day05/part2))))
+
+(deftest day06-test
+  (is (= 186597 (util/run day06/part1)))
+  (is (= 412 (util/run day06/part2))))
+
+(deftest day07-test
+  (is (= 21860 (util/run day07/part1)))
+  (is (= 2645740 (util/run day07/part2))))
