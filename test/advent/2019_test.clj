@@ -1,5 +1,6 @@
 (ns advent.2019-test
   (:require [clojure.test :refer :all]
+            [clojure.string :as str]
             [advent.util :as util]
             [advent-2019.day01 :as day01]
             [advent-2019.day02 :as day02]
@@ -8,6 +9,8 @@
             [advent-2019.day05 :as day05]
             [advent-2019.day06 :as day06]
             [advent-2019.day07 :as day07]
+            [advent-2019.day08 :as day08]
+            [advent-2019.day09 :as day09]
             ))
 
 (deftest day01-test
@@ -37,3 +40,18 @@
 (deftest day07-test
   (is (= 21860 (util/run day07/part1)))
   (is (= 2645740 (util/run day07/part2))))
+
+(deftest day08-test
+  (is (= 2975 (util/run day08/part1)))
+  (is (= (-> "████.█..█.███..█..█.████.
+              █....█..█.█..█.█..█.█....
+              ███..████.█..█.█..█.███..
+              █....█..█.███..█..█.█....
+              █....█..█.█.█..█..█.█....
+              ████.█..█.█..█..██..████."
+          (str/replace #"\s+" "\n"))
+         (util/run day08/part2))))
+
+(deftest day09-test
+  (is (= 4234906522 (util/run day09/part1)))
+  (is (= 60962 (util/run day09/part2))))

@@ -31,6 +31,14 @@
    [this inputs]
    "Adds `inputs` to the program input queue."))
 
+(defprotocol Memory
+  (get-memory
+   [this idx]
+   "Gets the value at memory location `idx`.")
+  (put-memory
+   [this idx v]
+   "Writes `v` at memory location `idx`."))
+
 (defprotocol Output
   (read-output
    [this]
@@ -63,13 +71,17 @@
            ret#))
        ~code)))
 
+;; Uncomment to turn off debugging entirely
+#_ (defmacro debug [& args]
+     (last args))
+
 
 ;;; Program interpreter
 
 ;; Helpers
 
-(defn digit-at [n place]
-  (mod (quot n (apply * (repeat place 10))) 10))
+(defn digit-at [^Integer n ^Integer place]
+  (mod (quot n (reduce * (repeat place 10))) 10))
 
 (defn arg-mode
   "Returns the `mode` for argument at `idx` (1-based)."
@@ -84,34 +96,55 @@
 
 (defn load-raw
   "Returns the raw value of memory at `idx` offset from `ip`."
-  [{:keys [memory ip]} idx]
+  [{:keys [ip] :as program} idx]
   (debug :load/raw ip "+" idx
-         (get memory (+ ip idx))))
+         (get-memory program (+ ip idx))))
+
+(defn load-ptr
+  "Returns the pointer referenced by `idx` (1-based), based on the arguments' mode
+
+  Modes:
+    0    argument is a pointer (returns memory value at ptr)
+    2    argument is an offset pointer (returns memory value at ptr + offset)"
+  [program idx]
+  (debug :load/ptr (:ip program) "+" idx
+         (let [v (load-raw program idx)
+               instr (load-raw program 0)]
+           (case (arg-mode instr idx)
+             ;; pointer
+             0 v
+             ;; pointer + offset
+             2 (+ v (:offset program))))))
 
 (defn load-val
   "Returns the value for argument `idx` (1-based), based on the argument's mode
 
   Modes:
     0    argument is a pointer (returns memory value at ptr)
-    1    argument is a value"
+    1    argument is a value
+    2    argument is an offset pointer (returns memory value at ptr + offset)"
   [program idx]
   (debug :load/val (:ip program) "+" idx
          (let [v (load-raw program idx)
                instr (load-raw program 0)]
            (case (arg-mode instr idx)
-             0 (get (:memory program) v)
-             1 v))))
+             ;; pointer
+             0 (get-memory program v)
+             ;; value
+             1 v
+             ;; pointer + offset
+             2 (get-memory program (+ v (:offset program)))))))
 
 ;; Instruction dispatch
 
-(defn dispatch [{:keys [memory ip]}]
-  (debug :instr/instr ip (instr (get memory ip))))
+(defn dispatch [{:keys [ip] :as program}]
+  (debug :instr/instr ip (instr (get-memory program ip))))
 
 (defmulti interpret dispatch)
 
 (defmethod interpret :default
-  [{:keys [memory ip] :as program}]
-  (throw (ex-info (format "Unknown op: %s" (instr (get memory ip)))
+  [{:keys [ip] :as program}]
+  (throw (ex-info (format "Unknown op: %s" (instr (get-memory program ip)))
                   program)))
 
 ;; Basic instruction set
@@ -120,28 +153,28 @@
   [program]
   (let [a (load-val program 1)
         b (load-val program 2)
-        p (load-raw program 3)]
+        p (load-ptr program 3)]
     (-> program
-        (update :memory assoc p (debug :op/add a b "=>" p (+ a b)))
+        (put-memory p (debug :op/add a b "=>" p (+' a b)))
         (update :ip + 4))))
 
 (defmethod interpret 2 ;; multiply
   [program]
   (let [a (load-val program 1)
         b (load-val program 2)
-        p (load-raw program 3)]
+        p (load-ptr program 3)]
     (-> program
-        (update :memory assoc p (debug :op/mul a b "=>" p (* a b)))
+        (put-memory p (debug :op/mul a b "=>" p (*' a b)))
         (update :ip + 4))))
 
 (defmethod interpret 3 ;; read input
   [{:keys [input] :as program}]
-  (let [p (load-raw program 1)
+  (let [p (load-ptr program 1)
         v (peek input)]
     (cond
       v (-> program
             (update :input pop)
-            (update :memory assoc p (debug :op/input p v))
+            (put-memory p (debug :op/input p v))
             (update :ip + 2))
       ;; `nil` means EOF
       (seq input) (assoc program :state (debug :op/input p :end))
@@ -179,19 +212,26 @@
   [program]
   (let [a (load-val program 1)
         b (load-val program 2)
-        p (load-raw program 3)]
+        p (load-ptr program 3)]
     (-> program
-        (assoc-in [:memory p] (debug :op/lt a b "=>" p (if (< a b) 1 0)))
+        (put-memory p (debug :op/lt a b "=>" p (if (< a b) 1 0)))
         (update :ip + 4))))
 
 (defmethod interpret 8 ;; eq
   [program]
   (let [a (load-val program 1)
         b (load-val program 2)
-        p (load-raw program 3)]
+        p (load-ptr program 3)]
     (-> program
-        (assoc-in [:memory p] (debug :op/eq a b "=>" p (if (= a b) 1 0)))
+        (put-memory p (debug :op/eq a b "=>" p (if (= a b) 1 0)))
         (update :ip + 4))))
+
+(defmethod interpret 9 ;; adjust relative param offset
+  [program]
+  (let [a (load-val program 1)]
+    (-> program
+        (update :offset #(debug :op/offset a "+" % (+' a %)))
+        (update :ip + 2))))
 
 (defmethod interpret 99 ;; halt
   [program]
@@ -201,11 +241,26 @@
 ;;; Program
 
 (defrecord Program
-  [id memory ip state input output]
+  [id memory ip offset state input output]
   Executable
   (get-state [this] state)
   (set-state [this state] (assoc this :state state))
   (run-step [this] (interpret this))
+  Memory
+  (get-memory [this idx] (get memory idx 0))
+  (put-memory [this idx v]
+    (debug :memory/put idx v)
+    ;; This _could_ be a map instead of a vector, but the output is
+    ;; significantly easier to read if it's a vector
+    ;; Alternatively, we could have a vector part and a map part (like lua),
+    ;; where the "code" is the vector, and the "memory" is the map
+    (if (< idx (count memory))
+      (update this :memory assoc idx v)
+      ;; increase memory then assoc
+      (let [blanks-needed (- idx (dec (count memory)))]
+        (-> this
+            (update :memory into (repeat blanks-needed 0))
+            (update :memory assoc idx v)))))
   Input
   (send-input [this input] (update this :input into input))
   Output
@@ -222,6 +277,7 @@
    {:id (new-pid)
     :memory (vec memory)
     :ip 0
+    :offset 0
     :state :init
     :input (clojure.lang.PersistentQueue/EMPTY)
     :output []}))
@@ -243,6 +299,12 @@
   (if (f program)
     (recur (run-step program) f)
     program))
+
+(defn run-steps
+  [program n]
+  (if (<= n 0)
+    program
+    (recur (run-step program) (dec n))))
 
 (defn run-until
   "Runs the program until `f` is false."
