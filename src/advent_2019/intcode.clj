@@ -50,6 +50,8 @@
 
 ;;; Debug printer
 
+(def COMPILE_DEBUG false) ;; set to true to compile with debug logging
+
 (def ^:dynamic *debug* false)
 
 (defn should-debug? [tag]
@@ -62,19 +64,16 @@
 (defmacro debug [tag & args]
   (let [tags (cons tag (butlast args))
         code (last args)]
-    `(if (or ~@(for [v [tag (namespace tag)]
-                     :when v]
-                 `(should-debug? ~(keyword v))))
-       (do
-         (let [ret# ~code]
-           (println ";;" ~@tags (str "(" ret# ")"))
-           ret#))
-       ~code)))
-
-;; Uncomment to turn off debugging entirely
-#_ (defmacro debug [& args]
-     (last args))
-
+    (if COMPILE_DEBUG
+      `(if (or ~@(for [v [tag (namespace tag)]
+                       :when v]
+                   `(should-debug? ~(keyword v))))
+         (do
+           (let [ret# ~code]
+             (println ";;" ~@tags (str "(" ret# ")"))
+             ret#))
+         ~code)
+      code)))
 
 ;;; Program interpreter
 
@@ -258,6 +257,7 @@
       (update this :memory assoc idx v)
       ;; increase memory then assoc
       (let [blanks-needed (- idx (dec (count memory)))]
+        (debug :memory/resize "+" blanks-needed (inc idx))
         (-> this
             (update :memory into (repeat blanks-needed 0))
             (update :memory assoc idx v)))))

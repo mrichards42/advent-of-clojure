@@ -12,6 +12,9 @@
             [advent-2019.day08 :as day08]
             [advent-2019.day09 :as day09]
             [advent-2019.day10 :as day10]
+            [advent-2019.day11 :as day11]
+            [advent-2019.day12 :as day12]
+            [advent-2019.day13 :as day13]
             ))
 
 (deftest day01-test
@@ -60,3 +63,22 @@
 (deftest day10-test
   (is (= 263 (util/run day10/part1)))
   (is (= 1110 (util/run day10/part2))))
+
+(deftest day11-test
+  (is (= 1894 (util/run day11/part1)))
+  (is (= (-> "...██.█..█.████.█....████...██.███..█..█...
+              ....█.█.█.....█.█.......█....█.█..█.█..█...
+              ....█.██.....█..█......█.....█.███..████...
+              ....█.█.█...█...█.....█......█.█..█.█..█...
+              .█..█.█.█..█....█....█....█..█.█..█.█..█...
+              ..██..█..█.████.████.████..██..███..█..█..."
+             (str/replace #"\s+" "\n"))
+         (util/run day11/part2))))
+
+(deftest day12-test
+  (is (= 6678 (util/run day12/part1)))
+  (is (= 496734501382552 (util/run day12/part2))))
+
+(deftest day13-test
+  (is (= 270 (util/run day13/part1)))
+  (is (= 12535 (util/run day13/part2))))
