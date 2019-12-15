@@ -1,6 +1,7 @@
 (ns advent-2019.day11
   "Space Police"
   (:require [advent.util :as util]
+            [advent.grid :as grid]
             [advent-2019.intcode :as ic]
             [clojure.string :as str]))
 
@@ -177,18 +178,7 @@
 ; registration identifier does it paint on your hull?
 
 (defn hull-message [hull]
-  (let [x-min (apply min (map first (keys hull)))
-        x-max (apply max (map first (keys hull)))
-        y-min (apply min (map second (keys hull)))
-        y-max (apply max (map second (keys hull)))]
-    (str/join
-     "\n"
-     (for [y (range y-min (inc y-max))]
-       (str/join
-        (for [x (range x-min (inc x-max))]
-          (if (zero? (get hull [x y] 0))
-            "."
-            "█")))))))
+  (grid/draw-map hull #(if (= 1 %) "█" ".")))
 
 (defn part2 [f]
   (let [code (ic/parse-code f)

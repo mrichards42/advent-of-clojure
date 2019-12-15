@@ -135,15 +135,14 @@
     (for [y (range (count input))
           x (range (count (first input)))
           :when (= \# (get-in input [y x]))]
-      {:x x :y y})))
+      [x y])))
 
-(defn angle [{x1 :x y1 :y} {x2 :x y2 :y}]
+(defn angle [[x1 y1] [x2 y2]]
   (Math/atan2 (- y2 y1) (- x2 x1)))
 
 (defn visible-asteroids [origin asteroids]
   (->> (remove #{origin} asteroids)
        (group-by (partial angle origin))))
-
 
 (defn part1 [f]
   (let [asteroids (parse-asteroid-field f)]
@@ -237,7 +236,7 @@
 ; you get if you multiply its X coordinate by 100 and then add its Y
 ; coordinate? (For example, 8,2 becomes 802.)
 
-(defn dist [{x1 :x y1 :y} {x2 :x y2 :y}]
+(defn dist [[x1 y1] [x2 y2]]
   (Math/hypot (- x2 x1) (- y2 y1)))
 
 (defn asteroid-order [station asteroids]
@@ -271,6 +270,6 @@
                     (drop 199)
                     (first))]
     ;; compute the answer
-    (+ (* 100 (:x target)) (:y target))))
+    (+ (* 100 (first target)) (second target))))
 
 #_ (time (util/run part2))

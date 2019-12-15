@@ -1,8 +1,8 @@
 (ns advent-2019.day13
   "Care Package"
   (:require [advent.util :as util]
-            [advent-2019.intcode :as ic]
-            [clojure.string :as str]))
+            [advent.grid :as grid]
+            [advent-2019.intcode :as ic]))
 
 ;;; Part 1
 
@@ -61,20 +61,12 @@
           (partition-all 3 instructions)))
 
 (defn draw-screen [{:keys [board score]}]
-  (let [x-min 0
-        x-max (apply max (map first (keys board)))
-        y-min 0
-        y-max (apply max (map second (keys board)))]
-    (str/join
-     "\n"
-     (cons
-      ;; score
-      (format "score: %d" (or score 0))
-      ;; board
-      (for [y (range y-min (inc y-max))]
-        (str/join
-         (for [x (range x-min (inc x-max))]
-           (tile (get board [x y] 0)))))))))
+  (str
+   ;; score
+   (format "score: %d" (or score 0))
+   "\n"
+   ;; grid
+   (grid/draw-map board #(tile (or % 0)))))
 
 (defn part1 [f]
   (let [program (ic/program (ic/parse-code f))

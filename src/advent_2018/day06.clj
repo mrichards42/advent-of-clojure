@@ -1,6 +1,7 @@
 (ns advent-2018.day06
   "Chronal Coordinates"
   (:require [advent.util :as util]
+            [advent.grid :as grid]
             [clojure.string :as str]))
 
 ;;; Part 1
@@ -73,31 +74,22 @@
 ; What is the size of the largest area that isn't infinite?
 
 (defn parse-locations [f]
-  (->> (util/lines f)
-       (map-indexed (fn [i line]
-                      (let [[x y] (str/split line #"\s*,\s*")]
-                        {:id i
-                         :x (Integer/parseInt x)
-                         :y (Integer/parseInt y)})))))
-
-(defn bounds [coords]
-  {:x-min (apply min (map :x coords))
-   :x-max (apply max (map :x coords))
-   :y-min (apply min (map :y coords))
-   :y-max (apply max (map :y coords))})
+  (for [line (util/lines f)]
+    (->> (str/split line #"\s*,\s*")
+         (mapv #(Integer/parseInt %)))))
 
 (defn all-coords [bounds]
   (for [x (range (:x-min bounds) (inc (:x-max bounds)))
         y (range (:y-min bounds) (inc (:y-max bounds)))]
-    {:x x :y y}))
+    [x y]))
 
-(defn on-edge? [bounds {:keys [x y]}]
+(defn on-edge? [bounds [x y]]
   (or (= (:x-min bounds) x)
       (= (:x-max bounds) x)
       (= (:y-min bounds) y)
       (= (:y-may bounds) y)))
 
-(defn dist [{x1 :x y1 :y} {x2 :x y2 :y}]
+(defn dist [[x1 y1] [x2 y2]]
   ;; This is very much the hot path in this ns, so marking types here speeds
   ;; things up _significantly_ (by a factor of about 10)
   (+ (Math/abs (- (int x1) (int x2)))
@@ -122,16 +114,16 @@
 
 (defn part1 [f]
   (let [locations (parse-locations f)
-        bounds (bounds locations)]
+        bounds (grid/bounds locations)]
     (->> (all-coords bounds)
-         (map #(assoc % :location (closest-location % locations)))
+         (group-by #(closest-location % locations))
          ;; exclude points without a single closest location
-         (filter :location)
+         (remove (comp #{nil} key))
+         (map val)
          ;; exclude locations w/ edge squares (since these have infinite area)
-         (group-by :location)
-         (remove #(some (partial on-edge? bounds) (val %)))
+         (remove #(some (partial on-edge? bounds) %))
          ;; find the location with the most squares
-         (map (comp count val))
+         (map count)
          (apply max))))
 
 #_ (time (util/run part1))
@@ -187,7 +179,7 @@
 (defn part2 [f]
   (let [target-distance 10000
         locations (parse-locations f)
-        bounds (bounds locations)]
+        bounds (grid/bounds locations)]
     (->> (all-coords bounds)
          (map #(sum-distances % locations))
          (filter #(and % (< % target-distance)))

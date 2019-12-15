@@ -1,6 +1,7 @@
 (ns advent-2018.day10
   "The Stars Align"
   (:require [advent.util :as util]
+            [advent.grid :as grid]
             [clojure.string :as str]))
 
 ;;; Part 1
@@ -177,14 +178,8 @@
 (defn parse-stars [f]
   (map parse-star (util/lines f)))
 
-(defn bounds [stars]
-  [[(apply min (map (comp first :position) stars))
-    (apply min (map (comp second :position) stars))]
-   [(apply max (map (comp first :position) stars))
-    (apply max (map (comp second :position) stars))]])
-
 (defn size [stars]
-  (let [[[x-min y-min] [x-max y-max]] (bounds stars)]
+  (let [{:keys [x-min y-min  x-max y-max]} (grid/bounds (map :position stars))]
     (* (- x-max x-min) (- y-max y-min))))
 
 (defn step
@@ -195,15 +190,11 @@
        (assoc star :position (mapv + position (map #(* n %) velocity)))))))
 
 (defn star-message [stars]
-  (let [[[x-min y-min] [x-max y-max]] (bounds stars)]
-    (str/join
-     "\n"
-     (for [y (range y-min (inc y-max))]
-       (str/join
-        (for [x (range x-min (inc x-max))]
-          (if (some #(= [x y] (:position %)) stars)
-            "#"
-            ".")))))))
+  (grid/draw-coords (map :position stars)
+                    (fn [xy]
+                      (if (some #(= xy (:position %)) stars)
+                        "#"
+                        "."))))
 
 ;; Step second by second, looking for the smallest bounding box
 
