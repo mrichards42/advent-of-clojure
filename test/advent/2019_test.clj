@@ -16,6 +16,7 @@
             [advent-2019.day12 :as day12]
             [advent-2019.day13 :as day13]
             [advent-2019.day14 :as day14]
+            [advent-2019.day15 :as day15]
             ))
 
 (deftest day01-test
@@ -87,3 +88,7 @@
 (deftest day14-test
   (is (= 273638 (util/run day14/part1)))
   (is (= 4200533 (util/run day14/part2))))
+
+(deftest day15-test
+  (is (= 262 (util/run day15/part1)))
+  (is (= 314 (util/run day15/part2))))
