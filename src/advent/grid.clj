@@ -1,6 +1,7 @@
 (ns advent.grid
   "Grid drawing utils"
-  (:require [clojure.string :as str]))
+  (:require [advent.util :as util]
+            [clojure.string :as str]))
 
 (defn draw-bounds
   "Returns a string representation of a grid, given a map of `bounds` and a
@@ -38,3 +39,17 @@
   `f` is a function taking a grid val that should return a string."
   [grid f]
   (draw-coords (keys grid) #(f (get grid %))))
+
+(defn parse
+  "Parses a grid represented by a string in `file`.
+
+  Calls `(f [x y] character)` for each location.
+
+  Returns a seq of non-nil returns from `f`."
+  [file f]
+  (letfn [(parse-line [y line]
+            (map-indexed (fn [x ch] (f [x y] ch)) line))]
+    (->> (util/lines file)
+      (map-indexed parse-line)
+      (apply concat)
+      (filter identity))))

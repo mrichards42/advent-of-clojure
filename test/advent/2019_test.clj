@@ -17,6 +17,9 @@
             [advent-2019.day13 :as day13]
             [advent-2019.day14 :as day14]
             [advent-2019.day15 :as day15]
+            [advent-2019.day16 :as day16]
+            [advent-2019.day17 :as day17]
+            [advent-2019.day18 :as day18]
             ))
 
 (deftest day01-test
@@ -92,3 +95,15 @@
 (deftest day15-test
   (is (= 262 (util/run day15/part1)))
   (is (= 314 (util/run day15/part2))))
+
+(deftest day16-test
+  (is (= "73127523" (util/run day16/part1)))
+  (is (= "80284420" (util/run day16/part2))))
+
+(deftest day17-test
+  (is (= 7280 (util/run day17/part1)))
+  (is (= 1045393 (util/run day17/part2))))
+
+(deftest day18-test
+  (is (= 3546 (util/run day18/part1)))
+  (is (= 1988 (util/run day18/part2))))
