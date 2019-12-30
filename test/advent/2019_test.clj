@@ -20,6 +20,13 @@
             [advent-2019.day16 :as day16]
             [advent-2019.day17 :as day17]
             [advent-2019.day18 :as day18]
+            [advent-2019.day19 :as day19]
+            [advent-2019.day20 :as day20]
+            [advent-2019.day21 :as day21]
+            [advent-2019.day22 :as day22]
+            [advent-2019.day23 :as day23]
+            [advent-2019.day24 :as day24]
+            [advent-2019.day25 :as day25]
             ))
 
 (deftest day01-test
@@ -107,3 +114,30 @@
 (deftest day18-test
   (is (= 3546 (util/run day18/part1)))
   (is (= 1988 (util/run day18/part2))))
+
+(deftest day19-test
+  (is (= 215 (util/run day19/part1)))
+  (is (= 7720975 (util/run day19/part2))))
+
+(deftest day20-test
+  (is (= 510 (util/run day20/part1)))
+  (is (= 5652 (util/run day20/part2))))
+
+(deftest day21-test
+  (is (= 19351230 (util/run day21/part1)))
+  (is (= 1141262756 (util/run day21/part2))))
+
+(deftest day22-test
+  (is (= 6526 (util/run day22/part1)))
+  (is (= 79855812422607 (util/run day22/part2))))
+
+(deftest day23-test
+  (is (= 24954 (util/run day23/part1)))
+  (is (= 17091 (util/run day23/part2))))
+
+(deftest day24-test
+  (is (= 32511025 (util/run day24/part1)))
+  (is (= 1932 (util/run day24/part2))))
+
+(deftest day25-test
+  (is (= "285213704" (util/run day25/part1))))
