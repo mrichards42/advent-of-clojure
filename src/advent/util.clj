@@ -8,6 +8,14 @@
 (defn map-vals [f m]
   (reduce-kv (fn [m k v] (assoc m k (f v))) m m))
 
+(defn pfilter
+  "Like pmap, but for filter"
+  [pred xs]
+  (->> xs
+       (pmap (juxt pred identity))
+       (filter first)
+       (map second)))
+
 (defn example-input
   "Removes indents from a string of text to make it easier to use as example
   input. The first line is ignored, and any shared indentation from all
