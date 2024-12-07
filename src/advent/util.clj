@@ -8,20 +8,45 @@
 (defn map-vals [f m]
   (reduce-kv (fn [m k v] (assoc m k (f v))) m m))
 
+(defn example-input
+  "Removes indents from a string of text to make it easier to use as example
+  input. The first line is ignored, and any shared indentation from all
+  remaining lines is stripped.
+
+  (example-input \"testing
+                  1 2 3
+                       indented!\")
+  \"testing
+  1 2 3
+       indented!\"
+  "
+  [txt]
+  (let [[fst & more] (str/split-lines txt)
+        shared-indent (->> more
+                           (filter (comp pos? count))
+                           (map #(count (re-find #"^ *" %)))
+                           (reduce min))]
+    (if (pos-int? shared-indent)
+      (->> (map (fn [line]
+                  (if (seq line)
+                    (subs line shared-indent)
+                    line))
+                more)
+           (cons fst)
+           (str/join "\n"))
+      txt)))
+
 ;; File parsing functions
 
-(defn lines
+(defn ^:deprecated lines
   "Returns a seq of lines from a file."
-  [f]
-  (with-open [r (io/reader f)]
-    (->> r
-         (line-seq)
-         (doall))))
+  [input]
+  (str/split-lines input))
 
-(defn slurp
+(defn ^:deprecated slurp
   "Slurp and remove any trailing newlines."
-  [f]
-  (str/trim-newline (clojure.core/slurp f)))
+  [input]
+  (str/trim-newline input))
 
 ;; File finding functions
 
@@ -47,7 +72,9 @@
   ([]
    `(data ~(ns-name *ns*)))
   ([ns]
-   `(io/resource ~(file-from-symbol ns))))
+   `(-> (io/resource ~(file-from-symbol ns))
+        (clojure.core/slurp)
+        (str/trim-newline))))
 
 (defmacro run
   "Runs a function with the appropriate data."

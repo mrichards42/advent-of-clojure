@@ -341,7 +341,6 @@
            #d.....................#
            ########################"
            (clojure.string/replace #" " "")
-           (.getBytes)
            (parse-tunnel)
            (build-edges)))
 
@@ -540,7 +539,6 @@
         (update cy       #(str (subs % 0 (dec cx)) "###" (subs % (+ 2 cx))))
         (update (inc cy) #(str (subs % 0 (dec cx)) "@#@" (subs % (+ 2 cx))))
         (->> (str/join "\n"))
-        (.getBytes)
         ;; then parse as normal
         (parse-tunnel))))
 
@@ -555,7 +553,6 @@
            #fEbA.#.FgHi#
            #############"
            (clojure.string/replace #" " "")
-           (.getBytes)
            (parse-tunnel-2)
            (build-edges)))
 

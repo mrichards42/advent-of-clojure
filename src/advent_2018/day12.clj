@@ -186,7 +186,6 @@
        ###.# => #
        ####. => #"
        (str/replace #"^\s+" "")
-       (.getBytes "utf-8")
        (parse-input)
        (print-simulation 100))
 
