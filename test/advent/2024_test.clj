@@ -9,7 +9,7 @@
             [advent-2024.day05 :as day05]
             [advent-2024.day06 :as day06]
             [advent-2024.day07 :as day07]
-            #_[advent-2024.day08 :as day08]
+            [advent-2024.day08 :as day08]
             #_[advent-2024.day09 :as day09]
             #_[advent-2024.day10 :as day10]
             #_[advent-2024.day11 :as day11]
@@ -56,3 +56,7 @@
 (deftest day07-test
   (is (= 28730327770375 (util/run day07/part1)))
   (is (= 424977609625985 (util/run day07/part2))))
+
+(deftest day08-test
+  (is (= 247 (util/run day08/part1)))
+  (is (= 861 (util/run day08/part2))))

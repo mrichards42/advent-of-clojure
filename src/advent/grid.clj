@@ -45,10 +45,11 @@
   Calls `(f [x y] character)` for each location.
 
   Returns a seq of non-nil returns from `f`."
-  [input f]
-  (letfn [(parse-line [y line]
-            (map-indexed (fn [x ch] (f [x y] ch)) line))]
-    (->> (str/split-lines input)
-         (map-indexed parse-line)
-         (apply concat)
-         (filter identity))))
+  ([input] (parse input vector))
+  ([input f]
+   (letfn [(parse-line [y line]
+             (map-indexed (fn [x ch] (f [x y] ch)) line))]
+     (->> (str/split-lines input)
+          (map-indexed parse-line)
+          (apply concat)
+          (filter identity)))))
