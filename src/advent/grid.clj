@@ -45,8 +45,8 @@
   Calls `(f [x y] character)` for each location.
 
   Returns a seq of non-nil returns from `f`."
-  ([input] (parse input vector))
-  ([input f]
+  ([input] (parse vector input))
+  ([f input]
    (letfn [(parse-line [y line]
              (map-indexed (fn [x ch] (f [x y] ch)) line))]
      (->> (str/split-lines input)

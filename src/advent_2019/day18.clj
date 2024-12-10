@@ -128,7 +128,8 @@
     (Character/isLowerCase t) {:type :key :id (Character/toUpperCase t) :pos pos}))
 
 (defn parse-tunnel [f]
-  (let [nodes (->> (grid/parse f parse-tile)
+  (let [nodes (->> f
+                   (grid/parse parse-tile)
                    (map (juxt :pos identity))
                    (into {}))]
     {:nodes nodes

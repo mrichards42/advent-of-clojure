@@ -84,12 +84,13 @@
 ; What is the biodiversity rating for the first layout that appears twice?
 
 (defn parse-bugs [f]
-  (->> (grid/parse f (fn [pos tile]
-                       (case tile
-                         \# {:pos pos
-                             :bug? true}
-                         \. {:pos pos
-                             :bug? false})))
+  (->> f
+       (grid/parse (fn [pos tile]
+                     (case tile
+                       \# {:pos pos
+                           :bug? true}
+                       \. {:pos pos
+                           :bug? false})))
        (map (juxt :pos identity))
        (into {})))
 
@@ -141,9 +142,9 @@
             (let [idx (+ x (* 5 y))]
               (reduce * 1 (repeat idx 2))))]
     (->> (vals g)
-      (filter :bug?)
-      (map (comp points :pos))
-      (reduce +))))
+         (filter :bug?)
+         (map (comp points :pos))
+         (reduce +))))
 
 (defn part1 [f]
   (->> (iterate step (parse-bugs f))
@@ -155,7 +156,7 @@
                #{})
        (biodiversity)))
 
-#_ (time (util/run part1))
+#_(time (util/run part1))
 
 ;;; Part 2
 
@@ -424,4 +425,4 @@
        (filter :bug?)
        (count)))
 
-#_ (time (util/run part2))
+#_(time (util/run part2))

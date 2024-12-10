@@ -111,9 +111,10 @@
               "#" {:pos xy :type :wall}
               ;; else it's a letter
               {:pos xy :type :letter :id c}))]
-    (->> (grid/parse f parse-tile)
-      (map (juxt :pos identity))
-      (into {}))))
+    (->> f
+         (grid/parse parse-tile)
+         (map (juxt :pos identity))
+         (into {}))))
 
 (defn label-square [g {:keys [pos id]}]
   (first
