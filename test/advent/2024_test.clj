@@ -18,7 +18,7 @@
             #_[advent-2024.day14 :as day14]
             #_[advent-2024.day15 :as day15]
             #_[advent-2024.day16 :as day16]
-            #_[advent-2024.day17 :as day17]
+            [advent-2024.day17 :as day17]
             #_[advent-2024.day18 :as day18]
             #_[advent-2024.day19 :as day19]
             #_[advent-2024.day20 :as day20]
@@ -80,3 +80,7 @@
 (deftest day13-test
   (is (= 40369 (util/run day13/part1)))
   (is (= 72587986598368 (util/run day13/part2))))
+
+(deftest day17-test
+  (is (= "4,0,4,7,1,2,7,1,6" (util/run day17/part1)))
+  (is (= 202322348616234 (util/run day17/part2))))
