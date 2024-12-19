@@ -53,3 +53,15 @@
           (map-indexed parse-line)
           (apply concat)
           (filter identity)))))
+
+(def moves-4
+  {\> [1 0]
+   \< [-1 0]
+   \v [0 1]
+   \^ [0 -1]})
+
+(defn move [[x y] [dx dy]]
+  [(+ x dx) (+ y dy)])
+
+(defn neighbors-4 [pos]
+  (map #(move pos %) (vals moves-4)))
