@@ -20,7 +20,7 @@
             #_[advent-2024.day16 :as day16]
             [advent-2024.day17 :as day17]
             [advent-2024.day18 :as day18]
-            #_[advent-2024.day19 :as day19]
+            [advent-2024.day19 :as day19]
             #_[advent-2024.day20 :as day20]
             #_[advent-2024.day21 :as day21]
             #_[advent-2024.day22 :as day22]
@@ -88,3 +88,7 @@
 (deftest day18-test
   (is (= 382 (util/run day18/part1)))
   (is (= "6,36" (util/run day18/part2))))
+
+(deftest day19-test
+  (is (= 251 (util/run day19/part1)))
+  (is (= 616957151871345 (util/run day19/part2))))
